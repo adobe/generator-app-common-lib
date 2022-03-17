@@ -13,10 +13,12 @@ const utils = require('./lib/utils')
 const ActionGenerator = require('./lib/ActionGenerator')
 const constants = require('./lib/constants')
 const discover = require('./lib/discover')
+const commonTemplates = require('./lib/common-templates')
 
 module.exports = {
   utils,
   constants,
   ActionGenerator,
-  discover
+  discover,
+  commonTemplates
 }
