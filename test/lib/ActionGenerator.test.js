@@ -44,6 +44,9 @@ describe('implementation', () => {
   beforeEach(() => {
     ActionGenerator.prototype.templatePath = p => path.join('/fakeTplDir', p)
     ActionGenerator.prototype.destinationPath = (...args) => path.join('/fakeDestRoot', ...args)
+    ActionGenerator.prototype.env = {
+      error: (text) => { throw text }
+    }
     Generator.prototype.options = generatorOptions
   })
   describe('constructor', () => {
@@ -52,10 +55,16 @@ describe('implementation', () => {
       // eslint-disable-next-line no-new
       new ActionGenerator()
       expect(spy).toHaveBeenCalledWith('skip-prompt', { default: false })
-      expect(spy).toHaveBeenCalledWith('action-folder', { type: String })
-      expect(spy).toHaveBeenCalledWith('config-path', { type: String })
-      expect(spy).toHaveBeenCalledWith('full-key-to-manifest', { type: String, default: '' })
+      expect(spy).toHaveBeenCalledWith('action-folder', { type: String, description: expect.any(String) })
+      expect(spy).toHaveBeenCalledWith('config-path', { type: String, description: expect.any(String) })
+      expect(spy).toHaveBeenCalledWith('full-key-to-manifest', { type: String, description: expect.any(String), default: '' })
       spy.mockRestore()
+    })
+
+    test('no options', () => {
+      Generator.prototype.options = {} // no options set, should error
+      // eslint-disable-next-line no-new
+      expect(() => new ActionGenerator()).toThrowError()
     })
   })
   describe('promptForActionName', () => {
