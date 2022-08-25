@@ -190,7 +190,7 @@ Note: characters can only be split by '-'.
         n('/fakeDestRoot/ext.config.yaml'),
         'runtimeManifest',
         // function path should be checked to be relative to config file
-        { packages: { fakeDestRoot: { actions: { myAction: { annotations: { 'require-adobe-auth': true }, function: expect.stringContaining('myAction/index.js'), runtime: 'nodejs:16', web: 'yes' } }, license: 'Apache-2.0' } } })
+        { packages: { fakeDestRoot: { actions: { myAction: { annotations: { 'require-adobe-auth': true }, function: expect.stringContaining('myAction/index.js'), runtime: constants.defaultRuntimeKind, web: 'yes' } }, license: 'Apache-2.0' } } })
 
       // 3. make sure wskdebug dev dependency was added to package.json
       expect(utils.addDependencies).toHaveBeenCalledWith(actionGenerator, { '@openwhisk/wskdebug': expect.any(String) }, true)
@@ -222,7 +222,7 @@ Note: characters can only be split by '-'.
         n('/fakeDestRoot/ext.config.yaml'),
         'runtimeManifest',
         // function path should be checked to be relative to config file
-        { packages: { somepackage: { actions: { actionxyz: { function: 'fake.js' }, myAction: { annotations: { 'require-adobe-auth': true }, function: expect.stringContaining('myAction/index.js'), runtime: 'nodejs:16', web: 'yes' } } } } })
+        { packages: { somepackage: { actions: { actionxyz: { function: 'fake.js' }, myAction: { annotations: { 'require-adobe-auth': true }, function: expect.stringContaining('myAction/index.js'), runtime: constants.defaultRuntimeKind, web: 'yes' } } } } })
       // 3. make sure wskdebug dev dependency was added to package.json
       // prod
       expect(utils.addDependencies).toHaveBeenCalledWith(actionGenerator, {
@@ -352,7 +352,7 @@ Note: characters can only be split by '-'.
       actionGenerator.addAction('myAction', './templateFile.js')
 
       expect(utils.writePackageJson).not.toHaveBeenCalledWith(actionGenerator, expect.objectContaining({
-        engines: { node: '^14.18 || ^16.13 || >=18' }
+        engines: { node: constants.nodeEngines }
       }))
     })
   })
