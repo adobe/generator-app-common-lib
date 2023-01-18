@@ -18,7 +18,7 @@
     "node": "^14.18 || ^16.13 || >=18"
   },
   "devDependencies": {
-    "@types/jest": "^27.0.3",
+    "@types/jest": "^29.2.5",
     "eol": "^0.9.1",
     "eslint": "^7.21.1",
     "eslint-config-standard": "^16.0.3",
