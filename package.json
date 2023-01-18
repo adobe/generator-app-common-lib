@@ -33,7 +33,6 @@
     "js-yaml": "^4.1.0",
     "lodash.camelcase": "^4.3.0",
     "lodash.clonedeep": "^4.5.0",
-    "path": "^0.12.7",
     "upath": "^2.0.1",
     "yeoman-generator": "^5.5.2"
   }
