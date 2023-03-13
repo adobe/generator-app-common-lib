@@ -20,7 +20,7 @@
   "devDependencies": {
     "@types/jest": "^27.0.3",
     "eol": "^0.9.1",
-    "eslint": "^7.21.1",
+    "eslint": "^8.36.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-jest": "^25.3.0",
