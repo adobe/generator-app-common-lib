@@ -64,7 +64,7 @@ describe('implementation', () => {
     test('no options', () => {
       Generator.prototype.options = {} // no options set, should error
       // eslint-disable-next-line no-new
-      expect(() => new ActionGenerator()).toThrowError()
+      expect(() => new ActionGenerator()).toThrow()
     })
   })
   describe('promptForActionName', () => {
