@@ -11,6 +11,7 @@ governing permissions and limitations under the License.
 
 const utils = require('./lib/utils')
 const ActionGenerator = require('./lib/ActionGenerator')
+const EventsGenerator = require('./lib/EventsGenerator')
 const constants = require('./lib/constants')
 const commonTemplates = require('./lib/common-templates')
 
@@ -18,5 +19,6 @@ module.exports = {
   utils,
   constants,
   ActionGenerator,
+  EventsGenerator,
   commonTemplates
 }
