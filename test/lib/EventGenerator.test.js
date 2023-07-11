@@ -10,7 +10,7 @@ governing permissions and limitations under the License.
 */
 
 const path = require('path')
-jest.mock('@adobe/aio-lib-events')
+const mockData = require('./mock')
 const cloneDeep = require('lodash.clonedeep')
 const eventsSdk = require('@adobe/aio-lib-events')
 const { getProviderMetadataToProvidersExistingMap } = require('../../lib/events/EventsOfInterestHelper')
@@ -28,7 +28,7 @@ jest.mock('@adobe/aio-lib-ims', () => ({
 }))
 
 jest.mock('../../lib/events/EventsOfInterestHelper', () => ({
-  promptForEventsOfInterest: jest.fn().mockResolvedValue(selectedProvidersToEventMetadata),
+  promptForEventsOfInterest: jest.fn().mockResolvedValue(mockData.data.selectedProvidersToEventMetadata),
   getProviderMetadataToProvidersExistingMap: jest.fn()
 }))
 
@@ -43,100 +43,6 @@ jest.mock('yeoman-generator')
 jest.mock('@adobe/aio-lib-events')
 jest.mock('../../lib/utils.js')
 const utils = require('../../lib/utils.js')
-
-const selectedProvidersToEventMetadata = {
-  'provider-metadata-1': {
-    provider: {
-      id: 'provider-id-1',
-      label: 'provider-label-1',
-      description: 'provider-desc-1',
-      providerMetadata: 'provider-metadata-1',
-      eventMetadata: [{
-        name: 'event-metadata-1',
-        value: 'event-metadata-1',
-        description: 'event-metadata-desc-1'
-      }, {
-        name: 'event-metadata-2',
-        value: 'event-metadata-2',
-        description: 'event-metadata-desc-2'
-      }]
-    },
-    eventMetadata: ['event-metadata-1', 'event-metadata-2']
-  },
-  'provider-metadata-2': {
-    provider: {
-      id: 'provider-id-2',
-      label: 'provider-label-2',
-      description: 'provider-desc-2',
-      providerMetadata: 'provider-metadata-2',
-      eventMetadata: [{
-        name: 'event-metadata-3',
-        value: 'event-metadata-3',
-        description: 'event-metadata-desc-3'
-      }]
-    },
-    eventMetadata: ['event-metadata-3']
-  }
-}
-
-const projectConfig = {
-  id: 'project-id',
-  name: 'project-name',
-  title: 'project-title',
-  description: 'project-description',
-  org: {
-    id: 'org-id',
-    name: 'org-name',
-    ims_org_id: 'imsOrgId@AdobeOrg'
-  }
-}
-
-const testRegistration = {
-  description: 'test-description',
-  events_of_interest: [
-    {
-      event_codes: [
-        'event-metadata-1',
-        'event-metadata-2'
-      ],
-      provider_metadata: 'provider-metadata-1'
-    },
-    {
-      event_codes: [
-        'event-metadata-3'
-      ],
-      provider_metadata: 'provider-metadata-2'
-    }
-  ],
-  runtime_action: 'test-action-name'
-}
-
-const existingTestRegistration = {
-  description: 'test-description-existing',
-  events_of_interest: [
-    {
-      event_codes: [
-        'event-metadata-4',
-        'event-metadata-5'
-      ],
-      provider_metadata: 'provider-metadata-3'
-    }
-  ],
-  runtime_action: 'test-action-name-existing'
-}
-
-const eventsManifestDetails = {
-  registrations: {
-    'test-name': testRegistration
-  }
-}
-
-const eventDetailsInput = {
-  regName: 'test-name',
-  regDesc: 'test-description',
-  selectedProvidersToEventMetadata,
-  runtimeActionName: 'test-action-name'
-}
 
 const aioEventsMappingEnvVariable = 'AIO_events_providermetadata_to_provider_mapping'
 
@@ -206,7 +112,7 @@ describe('implementation', () => {
       await expect(eventsGenerator.initEventsClient()).rejects.toThrow('Incomplete .aio configuration, please import a valid Adobe Developer Console configuration via `aio app use` first.')
     })
     test('init event client successful', async () => {
-      eventsGenerator.projectConfig = projectConfig
+      eventsGenerator.projectConfig = mockData.data.projectConfig
       const eventsClient = await eventsGenerator.initEventsClient()
       expect(eventsClient).toBeTruthy()
     })
@@ -222,7 +128,7 @@ describe('implementation', () => {
       EventsGenerator.prototype.env = {
         error: (text) => { throw new Error(text) }
       }
-      eventsGenerator.projectConfig = projectConfig
+      eventsGenerator.projectConfig = mockData.data.projectConfig
     })
     afterEach(() => {
       promptSpy.mockRestore()
@@ -281,7 +187,7 @@ describe('implementation', () => {
       utils.readYAMLConfig.mockReturnValue({})
 
       eventsGenerator.addEvents(
-        eventDetailsInput
+        mockData.data.eventDetailsInput
       )
       // 1. test manifest creation with action information
       expect(utils.writeKeyYAMLConfig).toHaveBeenCalledWith(
@@ -289,7 +195,7 @@ describe('implementation', () => {
         n('/fakeDestRoot/ext.config.yaml'),
         'events',
         // function path should be checked to be relative to config file
-        eventsManifestDetails)
+        mockData.data.eventsManifestDetails)
       // 2. check if the env variable file is updated with right values
       expect(utils.appendVarsToDotenv).toHaveBeenCalledWith(eventsGenerator, 'Provider metadata to provider id mapping',
         aioEventsMappingEnvVariable, 'provider-metadata-1:provider-id-1,provider-metadata-2:provider-id-2')
@@ -302,12 +208,12 @@ describe('implementation', () => {
       utils.readYAMLConfig.mockReturnValue({
         events: {
           registrations: {
-            'test-name-existing': existingTestRegistration
+            'test-name-existing': mockData.data.existingTestRegistration
           }
         }
       })
 
-      eventsGenerator.addEvents(eventDetailsInput, './templateFile.js')
+      eventsGenerator.addEvents(mockData.data.eventDetailsInput, './templateFile.js')
 
       // 1. test manifest creation with action information, and preserving previous content
       expect(utils.writeKeyYAMLConfig).toHaveBeenCalledWith(
@@ -317,8 +223,8 @@ describe('implementation', () => {
         // function path should be checked to be relative to config file
         {
           registrations: {
-            'test-name': testRegistration,
-            'test-name-existing': existingTestRegistration
+            'test-name': mockData.data.testRegistration,
+            'test-name-existing': mockData.data.existingTestRegistration
           }
         })
       // 2. check if the env variable file is updated with right values
@@ -333,16 +239,16 @@ describe('implementation', () => {
       utils.readYAMLConfig.mockReturnValue({
         events: {
           registrations: {
-            'test-name-existing': existingTestRegistration
+            'test-name-existing': mockData.data.existingTestRegistration
           }
         }
       })
 
       eventsGenerator.addEvents({
         regName: 'test-name-existing',
-        regDesc: eventDetailsInput.regDesc,
-        selectedProvidersToEventMetadata: eventDetailsInput.selectedProvidersToEventMetadata,
-        runtimeActionName: eventDetailsInput.runtimeActionName
+        regDesc: mockData.data.eventDetailsInput.regDesc,
+        selectedProvidersToEventMetadata: mockData.data.eventDetailsInput.selectedProvidersToEventMetadata,
+        runtimeActionName: mockData.data.eventDetailsInput.runtimeActionName
       }, './templateFile.js')
 
       // 1. test manifest creation with action information, and preserving previous content
@@ -353,7 +259,7 @@ describe('implementation', () => {
         // function path should be checked to be relative to config file
         {
           registrations: {
-            'test-name-existing': testRegistration
+            'test-name-existing': mockData.data.testRegistration
           }
         })
       // 2. check if the env variable file is updated with right values
@@ -377,19 +283,19 @@ describe('implementation', () => {
         },
         events: {
           registrations: {
-            'test-name-existing': existingTestRegistration
+            'test-name-existing': mockData.data.existingTestRegistration
           }
         }
       })
 
       eventsGenerator.addEvents({
-        regName: eventDetailsInput.regName,
+        regName: mockData.data.eventDetailsInput.regName,
         regDesc: 'test-description-existing',
         selectedProvidersToEventMetadata: {
           'provider-metadata-3': {
             provider: {
               id: 'provider-id-3',
-              providerMetadata: 'provider-metadata-3',
+              provider_metadata: 'provider-metadata-3',
               eventMetadata: [{
                 name: 'event-metadata-4',
                 value: 'event-metadata-4',
@@ -400,7 +306,7 @@ describe('implementation', () => {
                 description: 'event-metadata-desc-5'
               }]
             },
-            eventMetadata: ['event-metadata-4', 'event-metadata-5']
+            eventmetadata: ['event-metadata-4', 'event-metadata-5']
           }
         },
         runtimeActionName: 'test-action-name-existing'
@@ -414,8 +320,8 @@ describe('implementation', () => {
         // function path should be checked to be relative to config file
         {
           registrations: {
-            'test-name': existingTestRegistration,
-            'test-name-existing': existingTestRegistration
+            'test-name': mockData.data.existingTestRegistration,
+            'test-name-existing': mockData.data.existingTestRegistration
           }
         })
       // 2. check if the env variable file is updated with right values

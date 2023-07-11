@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npm run lint && npm run unit-tests",
+    "test": "npm run unit-tests && npm run lint",
     "lint": "eslint .",
     "unit-tests": "jest -c ./jest.config.js"
   },
