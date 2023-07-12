@@ -394,6 +394,6 @@ test('appendVarsToDotenv with previous content', () => {
   utils.appendVarsToDotenv(generator, 'fake', 'variable-a', 'value-a,value-b')
   expect(generator.fs.write).toHaveBeenCalledTimes(1)
   expect(generator.fs.append).toHaveBeenCalledTimes(0)
-  expect(generator.fs.write).toHaveBeenCalledWith('some-path',eol.auto(`variable-a=value-a,value-b
+  expect(generator.fs.write).toHaveBeenCalledWith('some-path', eol.auto(`variable-a=value-a,value-b
 `))
 })

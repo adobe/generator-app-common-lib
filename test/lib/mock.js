@@ -133,6 +133,39 @@ const embeddedProviderMetadata = {
   }
 }
 
+const runtimeManifestWithAvailableNonWebActions = {
+  packages: {
+    somepackage: {
+      actions: {
+        actionValidForEvents: {
+          function: 'fake.js',
+          web: 'no',
+          annotations: {
+            'require-adobe-auth': false
+          }
+        },
+        actionInvalidForEvents: {
+          function: 'fake.js',
+          web: 'yes',
+          annotations: {
+            'require-adobe-auth': true
+          }
+        }
+      }
+    }
+  }
+}
+
+const runtimeManifestWithWebActions = {
+  packages: {
+    somepackage: {
+      actions: {
+        actionxyz: { function: 'fake.js' }
+      }
+    }
+  }
+}
+
 const data = {
   selectedProvidersToEventMetadata,
   projectConfig,
@@ -141,7 +174,9 @@ const data = {
   eventsManifestDetails,
   eventDetailsInput,
   embeddedProviderMetadata,
-  providerMetadataList
+  providerMetadataList,
+  runtimeManifestWithWebActions,
+  runtimeManifestWithAvailableNonWebActions
 }
 
 module.exports = {
