@@ -38,7 +38,7 @@ describe('test runtime action selection helper', () => {
     })
 
     const runtimeActionName = await promptForRuntimeAction(eventsGenerator)
-    expect(runtimeActionName).toContain('somepackage/actionValidForEvents')
+    expect(runtimeActionName).toContain('actionValidForEvents')
     expect(promptSpy).toHaveBeenNthCalledWith(1,
       {
         default: false,
@@ -62,7 +62,7 @@ describe('test runtime action selection helper', () => {
     })
 
     const runtimeActionName = await promptForRuntimeAction(eventsGenerator)
-    expect(runtimeActionName).toContain('somepackage/test-runtime-action-name')
+    expect(runtimeActionName).toContain('test-runtime-action-name')
     expect(promptSpy).toHaveBeenNthCalledWith(1,
       {
         default: false,
@@ -86,7 +86,7 @@ describe('test runtime action selection helper', () => {
     eventsGenerator = new EventsGenerator()
 
     const runtimeActionName = await promptForRuntimeAction(eventsGenerator)
-    expect(runtimeActionName).toContain('somepackage/test-runtime-action-name')
+    expect(runtimeActionName).toContain('test-runtime-action-name')
     expect(promptSpy).toHaveBeenCalledTimes(0)
   })
 })
