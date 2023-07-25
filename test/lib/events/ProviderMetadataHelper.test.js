@@ -52,6 +52,22 @@ describe('test provider metadata selection helper', () => {
     expect(providerMetadataListSelected.length).toBe(2)
   })
 
+  test('select provider metadata prompt with providerMetadataId option', async () => {
+    promptSpy.mockResolvedValue({
+      providerMetadataIds: ['provider-metadata-1']
+    })
+    const providerMetadataListSelected = await getProviderMetadata(eventsGenerator, mockData.data.providerMetadataList, { providerMetadataId: 'provider-metadata-1' })
+    expect(providerMetadataListSelected.length).toBe(1)
+  })
+
+  test('select provider metadata prompt with empty provider metadata id list', async () => {
+    await expect(getProviderMetadata(eventsGenerator, [], { providerMetadataId: 'provider-metadata-1' })).rejects.toThrow('You are not entitled to provider metadata: provider-metadata-1')
+  })
+
+  test('select provider metadata prompt with empty provider metadata id list and no options', async () => {
+    await expect(getProviderMetadata(eventsGenerator, [])).rejects.toThrow('You are not entitled to any provider metadata')
+  })
+
   test('select provider metadata validator', async () => {
     promptSpy.mockResolvedValue('')
     await getProviderMetadata(eventsGenerator, mockData.data.providerMetadataList)
