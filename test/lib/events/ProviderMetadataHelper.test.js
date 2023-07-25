@@ -58,6 +58,9 @@ describe('test provider metadata selection helper', () => {
     })
     const providerMetadataListSelected = await getProviderMetadata(eventsGenerator, mockData.data.providerMetadataList, { providerMetadataId: 'provider-metadata-1' })
     expect(providerMetadataListSelected.length).toBe(1)
+    expect(promptSpy.mock.calls[0][0].choices).toStrictEqual(
+      [{ description: 'provider-metadata-desc-1', name: 'provider-metadata-label-1', value: 'provider-metadata-1' }]
+    )
   })
 
   test('select provider metadata prompt with empty provider metadata id list', async () => {
