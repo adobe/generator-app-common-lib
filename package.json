@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npm run lint && npm run unit-tests",
+    "test": "npm run unit-tests && npm run lint",
     "lint": "eslint .",
     "unit-tests": "jest -c ./jest.config.js"
   },
@@ -31,9 +31,14 @@
     "stdout-stderr": "^0.1.13"
   },
   "dependencies": {
+    "@adobe/aio-lib-core-config": "^3.1.0",
+    "@adobe/aio-lib-env": "^2.0.0",
+    "@adobe/aio-lib-events": "^3.1.0",
+    "@adobe/aio-lib-ims": "^6.3.0",
     "js-yaml": "^4.1.0",
     "lodash.camelcase": "^4.3.0",
     "lodash.clonedeep": "^4.5.0",
+    "process": "^0.11.10",
     "upath": "^2.0.1",
     "yeoman-generator": "^5.5.2"
   }

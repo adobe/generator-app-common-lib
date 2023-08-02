@@ -354,3 +354,46 @@ test('readYAMLConfig, configPath doesnt exists', () => {
   }
   expect(utils.readYAMLConfig(generator, 'some-path')).toStrictEqual({})
 })
+
+test('appendVarsToDotenv without previous content', () => {
+  const mockRead = jest.fn(() => '')
+  const mockExists = jest.fn(() => {
+    return false
+  })
+  const generator = {
+    destinationPath: jest.fn(() => 'some-path'),
+    fs: {
+      read: mockRead,
+      append: jest.fn(),
+      exists: mockExists,
+      write: jest.fn()
+    }
+  }
+
+  utils.appendVarsToDotenv(generator, 'fake', 'variable-a', 'value-a')
+  expect(generator.fs.append).toHaveBeenCalledWith('some-path', eol.auto(`## fake
+variable-a=value-a
+`))
+})
+
+test('appendVarsToDotenv with previous content', () => {
+  const mockRead = jest.fn(() => 'variable-a=value-a')
+  const mockExists = jest.fn(() => {
+    return true
+  })
+  const generator = {
+    destinationPath: jest.fn(() => 'some-path'),
+    fs: {
+      read: mockRead,
+      append: jest.fn(),
+      exists: mockExists,
+      write: jest.fn()
+    }
+  }
+
+  utils.appendVarsToDotenv(generator, 'fake', 'variable-a', 'value-a,value-b')
+  expect(generator.fs.write).toHaveBeenCalledTimes(1)
+  expect(generator.fs.append).toHaveBeenCalledTimes(0)
+  expect(generator.fs.write).toHaveBeenCalledWith('some-path', eol.auto(`variable-a=value-a,value-b
+`))
+})
