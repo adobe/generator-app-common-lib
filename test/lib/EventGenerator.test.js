@@ -145,7 +145,7 @@ describe('implementation', () => {
       expect(regDetails.runtimeActionName).toContain('test-action-name')
     })
 
-    test('skip prompt for event details', async () => {
+    test('skip prompt for event details to have no effect', async () => {
       eventsGenerator.options = { 'skip-prompt': true }
       promptSpy.mockResolvedValue({
         regName: 'test-name',
@@ -153,7 +153,9 @@ describe('implementation', () => {
       })
       const regDetails = await eventsGenerator.promptForEventsDetails({ regName: 'defaultName', regDesc: 'defaultDesc' })
       // { regName, regDesc, selectedProvidersToEventMetadata, runtimeActionName }
-      expect(regDetails).toBeUndefined()
+      expect(regDetails.regName).toContain('test-name')
+      expect(regDetails.regDesc).toContain('test-description')
+      expect(regDetails.runtimeActionName).toContain('test-action-name')
     })
   })
 
