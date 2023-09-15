@@ -1,6 +1,6 @@
 {
   "name": "@adobe/generator-app-common-lib",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -33,7 +33,7 @@
   "dependencies": {
     "@adobe/aio-lib-core-config": "^3.1.0",
     "@adobe/aio-lib-env": "^2.0.0",
-    "@adobe/aio-lib-events": "^3.1.0",
+    "@adobe/aio-lib-events": "^3.2.0",
     "@adobe/aio-lib-ims": "^6.3.0",
     "js-yaml": "^4.1.0",
     "lodash.camelcase": "^4.3.0",
