@@ -44,7 +44,7 @@ jest.mock('@adobe/aio-lib-events')
 jest.mock('../../lib/utils.js')
 const utils = require('../../lib/utils.js')
 
-const aioEventsMappingEnvVariable = 'AIO_events_providermetadata_to_provider_mapping'
+const aioEventsMappingEnvVariable = 'AIO_EVENTS_PROVIDERMETADATA_TO_PROVIDER_MAPPING'
 
 beforeEach(() => {
   utils.readYAMLConfig.mockRestore()
