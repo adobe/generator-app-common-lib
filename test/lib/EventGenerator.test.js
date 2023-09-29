@@ -191,7 +191,17 @@ describe('implementation', () => {
       getProviderMetadataToProvidersExistingMap.mockImplementation(() => {})
       utils.readPackageJson.mockReturnValue({})
       utils.readYAMLConfig.mockReturnValue({})
-
+      eventsGenerator.loadRuntimeManifest.mockReturnValue({
+        runtimeManifest: {
+          packages: {
+            'dx-excshell-1': {
+              license: 'Apache-2.0',
+              actions: {}
+            }
+          }
+        },
+        runtimePackageName: 'dx-excshell-1'
+      })
       eventsGenerator.addEvents(
         mockData.data.eventDetailsInput
       )
@@ -211,6 +221,30 @@ describe('implementation', () => {
       // mock files
       getProviderMetadataToProvidersExistingMap.mockReturnValueOnce({ 'provider-metadata-3': 'provider-3' })
       utils.readPackageJson.mockReturnValue({})
+      eventsGenerator.loadRuntimeManifest.mockReturnValue({
+        runtimeManifest: {
+          packages: {
+            'dx-excshell-1': {
+              license: 'Apache-2.0',
+              actions: {
+                'test-action-name-existing': {
+                  function: 'actions/generic/index.js',
+                  web: 'yes',
+                  runtime: 'nodejs:16',
+                  inputs: {
+                    LOG_LEVEL: 'debug'
+                  },
+                  annotations: {
+                    'require-adobe-auth': true,
+                    final: true
+                  }
+                }
+              }
+            }
+          }
+        },
+        runtimePackageName: 'dx-excshell-1'
+      })
       utils.readYAMLConfig.mockReturnValue({
         extensions: {
           'dx/excshell/1': {
@@ -247,6 +281,30 @@ describe('implementation', () => {
     test('with events manifest already exists and updating existing registration', () => {
       getProviderMetadataToProvidersExistingMap.mockReturnValueOnce({ 'provider-metadata-3': 'provider-id-3' })
       utils.readPackageJson.mockReturnValue({})
+      eventsGenerator.loadRuntimeManifest.mockReturnValue({
+        runtimeManifest: {
+          packages: {
+            'dx-excshell-1': {
+              license: 'Apache-2.0',
+              actions: {
+                'test-action-name-prev': {
+                  function: 'actions/generic/index.js',
+                  web: 'yes',
+                  runtime: 'nodejs:16',
+                  inputs: {
+                    LOG_LEVEL: 'debug'
+                  },
+                  annotations: {
+                    'require-adobe-auth': true,
+                    final: true
+                  }
+                }
+              }
+            }
+          }
+        },
+        runtimePackageName: 'dx-excshell-1'
+      })
       utils.readYAMLConfig.mockReturnValue({
         events: {
           registrations: {
