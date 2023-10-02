@@ -63,6 +63,8 @@ describe('prototype', () => {
   })
 })
 
+const eventsKey = 'extensions.dx/excshell/1.events'
+const eventsDataPath = '/fakeDestRoot/app.config.yaml'
 describe('implementation', () => {
   beforeEach(() => {
     EventsGenerator.prototype.templatePath = p => path.join('/fakeTplDir', p)
@@ -81,6 +83,7 @@ describe('implementation', () => {
       expect(spy).toHaveBeenCalledWith('skip-prompt', { default: false })
       expect(spy).toHaveBeenCalledWith('action-folder', { type: String, description: expect.any(String) })
       expect(spy).toHaveBeenCalledWith('config-path', { type: String, description: expect.any(String) })
+      expect(spy).toHaveBeenCalledWith('events-config-path', { type: String, description: expect.any(String) })
       expect(spy).toHaveBeenCalledWith('full-key-to-manifest', { type: String, description: expect.any(String), default: '' })
       expect(spy).toHaveBeenCalledWith('full-key-to-events-manifest', { type: String, description: expect.any(String), default: '' })
 
@@ -165,6 +168,7 @@ describe('implementation', () => {
       eventsGenerator = new EventsGenerator()
       eventsGenerator.options = { 'skip-prompt': false }
       eventsGenerator.addAction = jest.fn()
+      eventsGenerator.loadRuntimeManifest = jest.fn()
     })
 
     test('with no options and manifest does not exist and no regDetails', () => {
@@ -187,15 +191,25 @@ describe('implementation', () => {
       getProviderMetadataToProvidersExistingMap.mockImplementation(() => {})
       utils.readPackageJson.mockReturnValue({})
       utils.readYAMLConfig.mockReturnValue({})
-
+      eventsGenerator.loadRuntimeManifest.mockReturnValue({
+        runtimeManifest: {
+          packages: {
+            'dx-excshell-1': {
+              license: 'Apache-2.0',
+              actions: {}
+            }
+          }
+        },
+        runtimePackageName: 'dx-excshell-1'
+      })
       eventsGenerator.addEvents(
         mockData.data.eventDetailsInput
       )
       // 1. test manifest creation with action information
       expect(utils.writeKeyYAMLConfig).toHaveBeenCalledWith(
         eventsGenerator,
-        n('/fakeDestRoot/ext.config.yaml'),
-        'events',
+        n(eventsDataPath),
+        eventsKey,
         // function path should be checked to be relative to config file
         mockData.data.eventsManifestDetails)
       // 2. check if the env variable file is updated with right values
@@ -207,21 +221,50 @@ describe('implementation', () => {
       // mock files
       getProviderMetadataToProvidersExistingMap.mockReturnValueOnce({ 'provider-metadata-3': 'provider-3' })
       utils.readPackageJson.mockReturnValue({})
+      eventsGenerator.loadRuntimeManifest.mockReturnValue({
+        runtimeManifest: {
+          packages: {
+            'dx-excshell-1': {
+              license: 'Apache-2.0',
+              actions: {
+                'test-action-name-existing': {
+                  function: 'actions/generic/index.js',
+                  web: 'yes',
+                  runtime: 'nodejs:16',
+                  inputs: {
+                    LOG_LEVEL: 'debug'
+                  },
+                  annotations: {
+                    'require-adobe-auth': true,
+                    final: true
+                  }
+                }
+              }
+            }
+          }
+        },
+        runtimePackageName: 'dx-excshell-1'
+      })
       utils.readYAMLConfig.mockReturnValue({
-        events: {
-          registrations: {
-            'test-name-existing': mockData.data.existingTestRegistration
+        extensions: {
+          'dx/excshell/1': {
+            $include: 'src/dx-excshell-1/ext.config.yaml',
+            events: {
+              registrations: {
+                'test-name-existing': mockData.data.existingTestRegistration
+              }
+            }
           }
         }
       })
 
       eventsGenerator.addEvents(mockData.data.eventDetailsInput, './templateFile.js')
 
-      // 1. test manifest creation with action information, and preserving previous content
+      // 1. test manifest creation with events information, and preserving previous content
       expect(utils.writeKeyYAMLConfig).toHaveBeenCalledWith(
         eventsGenerator,
-        n('/fakeDestRoot/ext.config.yaml'),
-        'events',
+        n(eventsDataPath),
+        eventsKey,
         // function path should be checked to be relative to config file
         {
           registrations: {
@@ -238,6 +281,30 @@ describe('implementation', () => {
     test('with events manifest already exists and updating existing registration', () => {
       getProviderMetadataToProvidersExistingMap.mockReturnValueOnce({ 'provider-metadata-3': 'provider-id-3' })
       utils.readPackageJson.mockReturnValue({})
+      eventsGenerator.loadRuntimeManifest.mockReturnValue({
+        runtimeManifest: {
+          packages: {
+            'dx-excshell-1': {
+              license: 'Apache-2.0',
+              actions: {
+                'test-action-name-prev': {
+                  function: 'actions/generic/index.js',
+                  web: 'yes',
+                  runtime: 'nodejs:16',
+                  inputs: {
+                    LOG_LEVEL: 'debug'
+                  },
+                  annotations: {
+                    'require-adobe-auth': true,
+                    final: true
+                  }
+                }
+              }
+            }
+          }
+        },
+        runtimePackageName: 'dx-excshell-1'
+      })
       utils.readYAMLConfig.mockReturnValue({
         events: {
           registrations: {
@@ -256,8 +323,8 @@ describe('implementation', () => {
       // 1. test manifest creation with action information, and preserving previous content
       expect(utils.writeKeyYAMLConfig).toHaveBeenCalledWith(
         eventsGenerator,
-        n('/fakeDestRoot/ext.config.yaml'),
-        'events',
+        n(eventsDataPath),
+        eventsKey,
         // function path should be checked to be relative to config file
         {
           registrations: {
@@ -272,23 +339,44 @@ describe('implementation', () => {
 
     test('with events manifest already exists and with new registration but same events of interest and existing runtime action', () => {
       getProviderMetadataToProvidersExistingMap.mockReturnValueOnce({ 'provider-metadata-3': 'provider-id-3' })
-      utils.readPackageJson.mockReturnValue({})
-      utils.readYAMLConfig.mockReturnValue({
+      eventsGenerator.loadRuntimeManifest.mockReturnValue({
         runtimeManifest: {
           packages: {
-            somepackage: {
+            'dx-excshell-1': {
+              license: 'Apache - 2.0',
               actions: {
-                'test-action-name-existing': { function: 'fake.js' }
+                'test-action-name-existing': {
+                  function: 'actions/generic/index.js',
+                  web: 'yes',
+                  runtime: 'nodejs:16',
+                  inputs: {
+                    LOG_LEVEL: 'debug'
+                  },
+                  annotations: {
+                    'require-adobe-auth': true,
+                    final: true
+                  }
+                }
               }
             }
           }
         },
-        events: {
-          registrations: {
-            'test-name-existing': mockData.data.existingTestRegistration
-          }
-        }
+        runtimePackageName: 'dx-excshell-1'
       })
+      utils.readPackageJson.mockReturnValue({})
+      utils.readYAMLConfig
+        .mockReturnValueOnce({
+          extensions: {
+            'dx/excshell/1': {
+              $include: 'src/dx-excshell-1/ext.config.yaml',
+              events: {
+                registrations: {
+                  'test-name-existing': mockData.data.existingTestRegistration
+                }
+              }
+            }
+          }
+        })
 
       eventsGenerator.addEvents({
         regName: mockData.data.eventDetailsInput.regName,
@@ -317,8 +405,8 @@ describe('implementation', () => {
       // 1. test manifest creation with action information, and preserving previous content
       expect(utils.writeKeyYAMLConfig).toHaveBeenCalledWith(
         eventsGenerator,
-        n('/fakeDestRoot/ext.config.yaml'),
-        'events',
+        n(eventsDataPath),
+        eventsKey,
         // function path should be checked to be relative to config file
         {
           registrations: {

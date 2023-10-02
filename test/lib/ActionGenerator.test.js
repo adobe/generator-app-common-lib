@@ -40,6 +40,7 @@ beforeEach(() => {
   utils.writeKeyYAMLConfig.mockRestore()
 })
 
+const actionFolderPath = `src/dx-excshell-1/${constants.actionsDirname}`
 describe('implementation', () => {
   beforeEach(() => {
     ActionGenerator.prototype.templatePath = p => path.join('/fakeTplDir', p)
@@ -183,14 +184,14 @@ Note: characters can only be split by '-'.
       actionGenerator.addAction('myAction', './templateFile.js')
 
       // 1. test copy action template to right destination
-      expect(actionGenerator.fs.copyTpl).toHaveBeenCalledWith(n('/fakeTplDir/templateFile.js'), n(`${constants.actionsDirname}/myAction/index.js`), {}, {}, {})
+      expect(actionGenerator.fs.copyTpl).toHaveBeenCalledWith(n('/fakeTplDir/templateFile.js'), n(`${actionFolderPath}/myAction/index.js`), {}, {}, {})
       // 2. test manifest creation with action information
       expect(utils.writeKeyYAMLConfig).toHaveBeenCalledWith(
         actionGenerator,
-        n('/fakeDestRoot/ext.config.yaml'),
+        n('/fakeDestRoot/src/dx-excshell-1/ext.config.yaml'),
         'runtimeManifest',
         // function path should be checked to be relative to config file
-        { packages: { fakeDestRoot: { actions: { myAction: { annotations: { 'require-adobe-auth': true }, function: expect.stringContaining('myAction/index.js'), runtime: constants.defaultRuntimeKind, web: 'yes' } }, license: 'Apache-2.0' } } })
+        { packages: { 'dx-excshell-1': { actions: { myAction: { annotations: { 'require-adobe-auth': true }, function: expect.stringContaining('myAction/index.js'), runtime: constants.defaultRuntimeKind, web: 'yes' } }, license: 'Apache-2.0' } } })
 
       // 3. make sure wskdebug dev dependency was added to package.json
       expect(utils.addDependencies).toHaveBeenCalledWith(actionGenerator, { '@openwhisk/wskdebug': expect.any(String) }, true)
@@ -202,10 +203,9 @@ Note: characters can only be split by '-'.
       utils.readYAMLConfig.mockReturnValue({
         runtimeManifest: {
           packages: {
-            somepackage: {
+            'dx-excshell-1': {
               actions: {
                 actionxyz: { function: 'fake.js' }
-
               }
             }
           }
@@ -215,14 +215,14 @@ Note: characters can only be split by '-'.
       actionGenerator.addAction('myAction', './templateFile.js', { dependencies: { abc: '1.2.3', def: '4.5.6' }, devDependencies: { xyz: '3.2.1', vuw: '6.5.4' } })
 
       // 1. test copy action template to right destination
-      expect(actionGenerator.fs.copyTpl).toHaveBeenCalledWith(n('/fakeTplDir/templateFile.js'), n(`${constants.actionsDirname}/myAction/index.js`), {}, {}, {})
+      expect(actionGenerator.fs.copyTpl).toHaveBeenCalledWith(n('/fakeTplDir/templateFile.js'), n(`${actionFolderPath}/myAction/index.js`), {}, {}, {})
       // 2. test manifest creation with action information, and preserving previous content
       expect(utils.writeKeyYAMLConfig).toHaveBeenCalledWith(
         actionGenerator,
-        n('/fakeDestRoot/ext.config.yaml'),
+        n('/fakeDestRoot/src/dx-excshell-1/ext.config.yaml'),
         'runtimeManifest',
         // function path should be checked to be relative to config file
-        { packages: { somepackage: { actions: { actionxyz: { function: 'fake.js' }, myAction: { annotations: { 'require-adobe-auth': true }, function: expect.stringContaining('myAction/index.js'), runtime: constants.defaultRuntimeKind, web: 'yes' } } } } })
+        { packages: { 'dx-excshell-1': { actions: { actionxyz: { function: 'fake.js' }, myAction: { annotations: { 'require-adobe-auth': true }, function: expect.stringContaining('myAction/index.js'), runtime: constants.defaultRuntimeKind, web: 'yes' } } } } })
       // 3. make sure wskdebug dev dependency was added to package.json
       // prod
       expect(utils.addDependencies).toHaveBeenCalledWith(actionGenerator, {
@@ -244,7 +244,7 @@ Note: characters can only be split by '-'.
       actionGenerator.addAction('myAction', './templateFile.js', { tplContext: { fake: 'context', with: { fake: 'values' } } })
 
       // 1. test copy action template to right destination with template options
-      expect(actionGenerator.fs.copyTpl).toHaveBeenCalledWith(n('/fakeTplDir/templateFile.js'), n(`${constants.actionsDirname}/myAction/index.js`), { fake: 'context', with: { fake: 'values' } }, {}, {})
+      expect(actionGenerator.fs.copyTpl).toHaveBeenCalledWith(n('/fakeTplDir/templateFile.js'), n(`${actionFolderPath}/myAction/index.js`), { fake: 'context', with: { fake: 'values' } }, {}, {})
     })
 
     test('with tplContext option and actionDestPath already set and no maniifest', () => {
@@ -255,7 +255,7 @@ Note: characters can only be split by '-'.
       actionGenerator.addAction('myAction', './templateFile.js', { tplContext: { actionDestPath: `${path.sep}fakeDestRoot${path.sep}${constants.actionsDirname}${path.sep}myAction${path.sep}index.js`, fake: 'context', with: { fake: 'values' } } })
 
       // 1. test copy action template to predefined destination
-      expect(actionGenerator.fs.copyTpl).toHaveBeenCalledWith(n('/fakeTplDir/templateFile.js'), n(`${constants.actionsDirname}${path.sep}myAction${path.sep}index.js`), { actionDestPath: `${path.sep}fakeDestRoot${path.sep}${constants.actionsDirname}${path.sep}myAction${path.sep}index.js`, fake: 'context', with: { fake: 'values' } }, {}, {})
+      expect(actionGenerator.fs.copyTpl).toHaveBeenCalledWith(n('/fakeTplDir/templateFile.js'), n(`${actionFolderPath}${path.sep}myAction${path.sep}index.js`), { actionDestPath: `${path.sep}fakeDestRoot${path.sep}${constants.actionsDirname}${path.sep}myAction${path.sep}index.js`, fake: 'context', with: { fake: 'values' } }, {}, {})
     })
 
     test('with extra actionManifestConfig and no manifest', () => {
@@ -267,10 +267,10 @@ Note: characters can only be split by '-'.
       // test manifest creation with action information
       expect(utils.writeKeyYAMLConfig).toHaveBeenCalledWith(
         actionGenerator,
-        n('/fakeDestRoot/ext.config.yaml'),
+        n('/fakeDestRoot/src/dx-excshell-1/ext.config.yaml'),
         'runtimeManifest',
         // function path should be checked to be relative to config file
-        { packages: { fakeDestRoot: { actions: { myAction: { runtime: 'fake:42', inputs: { fake: 'value' }, annotations: { 'require-adobe-auth': true }, function: expect.stringContaining('myAction/index.js'), web: 'yes' } }, license: 'Apache-2.0' } } })
+        { packages: { 'dx-excshell-1': { actions: { myAction: { runtime: 'fake:42', inputs: { fake: 'value' }, annotations: { 'require-adobe-auth': true }, function: expect.stringContaining('myAction/index.js'), web: 'yes' } }, license: 'Apache-2.0' } } })
     })
 
     test('with dotenvStub option', () => {
@@ -289,7 +289,7 @@ Note: characters can only be split by '-'.
 
       actionGenerator.addAction('myAction', './templateFile.js', { testFile: './template.test.js' })
       expect(actionGenerator.fs.copyTpl).toHaveBeenCalledTimes(2)
-      expect(actionGenerator.fs.copyTpl).toHaveBeenCalledWith(n('/fakeTplDir/template.test.js'), n('/fakeDestRoot/test/myAction.test.js'), { actionRelPath: expect.stringContaining('myAction/index.js') }, {}, {})
+      expect(actionGenerator.fs.copyTpl).toHaveBeenCalledWith(n('/fakeTplDir/template.test.js'), n('/fakeDestRoot/src/dx-excshell-1/test/myAction.test.js'), { actionRelPath: expect.stringContaining('myAction/index.js') }, {}, {})
     })
 
     test('with testFile option and tplContext option', () => {
@@ -300,7 +300,7 @@ Note: characters can only be split by '-'.
       actionGenerator.addAction('myAction', './templateFile.js', { testFile: './template.test.js', tplContext: { fake: 'context', with: { fake: 'values' } } })
 
       expect(actionGenerator.fs.copyTpl).toHaveBeenCalledTimes(2)
-      expect(actionGenerator.fs.copyTpl).toHaveBeenCalledWith(n('/fakeTplDir/template.test.js'), n('/fakeDestRoot/test/myAction.test.js'), { actionRelPath: expect.stringContaining('myAction/index.js'), fake: 'context', with: { fake: 'values' } }, {}, {})
+      expect(actionGenerator.fs.copyTpl).toHaveBeenCalledWith(n('/fakeTplDir/template.test.js'), n('/fakeDestRoot/src/dx-excshell-1/test/myAction.test.js'), { actionRelPath: expect.stringContaining('myAction/index.js'), fake: 'context', with: { fake: 'values' } }, {}, {})
     })
 
     test('with e2eTestFile option', () => {
@@ -310,7 +310,7 @@ Note: characters can only be split by '-'.
 
       actionGenerator.addAction('myAction', './templateFile.js', { e2eTestFile: './templatee2e.test.js' })
       expect(actionGenerator.fs.copyTpl).toHaveBeenCalledTimes(2)
-      expect(actionGenerator.fs.copyTpl).toHaveBeenCalledWith(n('/fakeTplDir/templatee2e.test.js'), n('/fakeDestRoot/e2e/myAction.e2e.test.js'), { runtimePackageName: 'fakeDestRoot' }, {}, {})
+      expect(actionGenerator.fs.copyTpl).toHaveBeenCalledWith(n('/fakeTplDir/templatee2e.test.js'), n('/fakeDestRoot/src/dx-excshell-1/e2e/myAction.e2e.test.js'), { runtimePackageName: 'dx-excshell-1' }, {}, {})
     })
 
     test('with sharedLibFile option', () => {
@@ -320,7 +320,7 @@ Note: characters can only be split by '-'.
 
       actionGenerator.addAction('myAction', './templateFile.js', { sharedLibFile: './utils.js' })
 
-      expect(actionGenerator.fs.copyTpl).toHaveBeenCalledWith(n('/fakeTplDir/utils.js'), n(`/fakeDestRoot/${constants.actionsDirname}/utils.js`), {})
+      expect(actionGenerator.fs.copyTpl).toHaveBeenCalledWith(n('/fakeTplDir/utils.js'), n(`/fakeDestRoot/${actionFolderPath}/utils.js`), {})
     })
 
     test('with sharedLibTestFile option', () => {
@@ -330,7 +330,7 @@ Note: characters can only be split by '-'.
 
       actionGenerator.addAction('myAction', './templateFile.js', { sharedLibTestFile: './utils.test.js' })
 
-      expect(actionGenerator.fs.copyTpl).not.toHaveBeenCalledWith(n('/fakeTplDir/utils.test.js'), n(`/fakeDestRoot/test/${constants.actionsDirname}/utils.test.js`), {})
+      expect(actionGenerator.fs.copyTpl).not.toHaveBeenCalledWith(n('/fakeTplDir/utils.test.js'), n(`/fakeDestRoot/src/dx-excshell-1/test/${constants.actionsDirname}/utils.test.js`), {})
     })
 
     test('with sharedLibFile and sharedLibTestFile option', () => {
@@ -341,9 +341,10 @@ Note: characters can only be split by '-'.
       actionGenerator.addAction('myAction', './templateFile.js', { sharedLibFile: './utils.js', sharedLibTestFile: './utils.test.js' })
       expect(actionGenerator.fs.copyTpl).toHaveBeenCalled()
 
-      expect(actionGenerator.fs.copyTpl).toHaveBeenCalledWith(n('/fakeTplDir/utils.js'), n(`/fakeDestRoot/${constants.actionsDirname}/utils.js`), {})
-      expect(actionGenerator.fs.copyTpl).toHaveBeenCalledWith(n('/fakeTplDir/utils.test.js'), n('/fakeDestRoot/test/utils.test.js'), { utilsRelPath: expect.stringContaining('../actions/utils.js') }, {}, {})
+      expect(actionGenerator.fs.copyTpl).toHaveBeenCalledWith(n('/fakeTplDir/utils.js'), n(`/fakeDestRoot/${actionFolderPath}/utils.js`), {})
+      expect(actionGenerator.fs.copyTpl).toHaveBeenCalledWith(n('/fakeTplDir/utils.test.js'), n('/fakeDestRoot/src/dx-excshell-1/test/utils.test.js'), { utilsRelPath: expect.stringContaining('../actions/utils.js') }, {}, {})
     })
+
     test('with existing package.json node engines', () => {
       // mock files
       utils.readPackageJson.mockReturnValue({ engines: { node: '1 || 2' } })
