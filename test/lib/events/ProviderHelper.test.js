@@ -10,16 +10,41 @@ governing permissions and limitations under the License.
 */
 
 const mockData = require('../mock')
-const { selectEventMetadataForProvider, selectProviderForProviderMetadata } = require('../../../lib/events/ProviderHelper')
+const {
+  selectEventMetadataForProvider, selectProviderForProviderMetadata,
+  getAllEntitledProvidersForOrg
+} = require('../../../lib/events/ProviderHelper')
 const EventsGenerator = require('../../../lib/EventsGenerator')
+const eventsSdk = require('@adobe/aio-lib-events')
 
 jest.mock('yeoman-generator')
+jest.mock('@adobe/aio-lib-events')
 jest.mock('../../../lib/EventsGenerator')
 
 jest.mock('../../../lib/events/ProviderMetadataHelper', () => ({
   getEntitledProviderMetadataForOrg: jest.fn().mockResolvedValue(mockData.data.providerMetadataList),
   getProviderMetadata: jest.fn().mockResolvedValue(['provider-metadata-1', 'provider-metadata-2'])
 }))
+
+const mockEventsSdkInstance = {
+  getAllProviders: jest.fn().mockResolvedValue({
+    _embedded: {
+      providers: [{
+        id: 'provider-id-1',
+        label: 'provider-label-1',
+        description: 'provider-description-1',
+        provider_metadata: 'provider-metadata-1'
+      },
+      {
+        id: 'provider-id-2',
+        label: 'provider-label-2',
+        description: 'provider-description-2',
+        provider_metadata: 'provider-metadata-2'
+      }
+      ]
+    }
+  })
+}
 
 const getTestProvider = (index, numberOfEvents, providerMetadata) => {
   const eventMetadatas = []
@@ -46,11 +71,16 @@ const providerMetadataToProvidersMap = {
     getTestProvider(3, 1, 'provider-metadata-2')]
 }
 
+beforeEach(() => {
+  eventsSdk.init.mockResolvedValue(mockEventsSdkInstance)
+})
 describe('test provider selection helper', () => {
   let eventsGenerator
   let promptSpy
-  beforeEach(() => {
+  let eventsClient
+  beforeEach(async () => {
     promptSpy = jest.spyOn(EventsGenerator.prototype, 'prompt')
+    eventsClient = await eventsSdk.init('orgid', 'api-key', 'token')
     EventsGenerator.prototype.projectConfig = mockData.data.projectConfig
     eventsGenerator = new EventsGenerator()
   })
@@ -94,6 +124,11 @@ describe('test provider selection helper', () => {
     })
     const eventMetadataSelection = await selectEventMetadataForProvider(getTestProvider(1, 2, 'provider-metadata-1'), [], eventsGenerator)
     expect(eventMetadataSelection).toContain('event-code-2')
+  })
+
+  test('get all entitled providers for org', async () => {
+    const providerListResponse = await getAllEntitledProvidersForOrg(eventsClient, 'consumerId')
+    expect(providerListResponse.length).toBe(2)
   })
 
   test('validates empty for event metadata selection', async () => {
