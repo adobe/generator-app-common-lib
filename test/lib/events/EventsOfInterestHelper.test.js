@@ -12,14 +12,16 @@ governing permissions and limitations under the License.
 const eventsSdk = require('@adobe/aio-lib-events')
 const mockData = require('../mock')
 const { promptForEventsOfInterest, getProviderMetadataToProvidersExistingMap } = require('../../../lib/events/EventsOfInterestHelper')
-const { selectEventMetadataForProvider, selectProviderForProviderMetadata } = require('../../../lib/events/ProviderHelper')
+const { getAllEntitledProvidersForOrg, selectEventMetadataForProvider, selectProviderForProviderMetadata } = require('../../../lib/events/ProviderHelper')
 const EventsGenerator = require('../../../lib/EventsGenerator')
+const { getProviderMetadata } = require('../../../lib/events/ProviderMetadataHelper')
 jest.mock('yeoman-generator')
 jest.mock('../../../lib/EventsGenerator')
 jest.mock('@adobe/aio-lib-events')
 jest.mock('../../../lib/events/ProviderHelper', () => ({
   selectEventMetadataForProvider: jest.fn(),
-  selectProviderForProviderMetadata: jest.fn()
+  selectProviderForProviderMetadata: jest.fn(),
+  getAllEntitledProvidersForOrg: jest.fn()
 }))
 
 jest.mock('../../../lib/events/ProviderMetadataHelper', () => ({
@@ -45,17 +47,6 @@ const getTestProvider = (index, numberOfEvents) => {
   }
 }
 
-const mockEventsSdkInstance = {
-  getAllProviders: jest.fn().mockResolvedValue({
-    _embedded: {
-      providers: [
-        getTestProvider(1, 2),
-        getTestProvider(2, 1)
-      ]
-    }
-  })
-}
-
 const getTestSelectedProvider = (index, numberOfEvents) => {
   const eventMetadatas = []
   for (let number = 1; number <= numberOfEvents; number++) {
@@ -76,10 +67,6 @@ const getTestSelectedProvider = (index, numberOfEvents) => {
 
 const aioEventsMappingEnvVariableDotEnv = 'provider-metadata-1:provider-id-1,provider-metadata-2:provider-id-2'
 
-beforeEach(() => {
-  eventsSdk.init.mockResolvedValue(mockEventsSdkInstance)
-})
-
 describe('test prompt for events of interest', () => {
   let eventsGenerator
   let eventsClient
@@ -93,10 +80,28 @@ describe('test prompt for events of interest', () => {
     selectProviderForProviderMetadata
       .mockReturnValueOnce(getTestSelectedProvider(1, 2))
       .mockReturnValueOnce(getTestSelectedProvider(2, 1))
+    getAllEntitledProvidersForOrg.mockReturnValue([
+      getTestProvider(1, 2),
+      getTestProvider(2, 1),
+      getTestProvider(3, 0)
+    ])
   })
 
   test('successfully fetch providers to event metadata map', async () => {
     const eventsOfInterest = await promptForEventsOfInterest(eventsClient, eventsGenerator)
+    expect(getProviderMetadata).toHaveBeenCalledWith(eventsGenerator, [{
+      description: 'provider-metadata-desc-1',
+      group: 'provider-metadata-group-1',
+      has_multiple_providers: true,
+      id: 'provider-metadata-1',
+      label: 'provider-metadata-label-1'
+    }, {
+      description: 'provider-metadata-desc-2',
+      group: 'provider-metadata-group-2',
+      has_multiple_providers: false,
+      id: 'provider-metadata-2',
+      label: 'provider-metadata-label-2'
+    }], undefined)
     expect(eventsOfInterest['provider-metadata-1']).toBeTruthy()
     expect(eventsOfInterest['provider-metadata-2']).toBeTruthy()
     expect(eventsOfInterest['provider-metadata-1'].provider.id).toContain('provider-id-1')
