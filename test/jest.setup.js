@@ -37,8 +37,9 @@ global.assertNodeEngines = (fs, nodeEngines) => {
   }))
 }
 global.basicGeneratorOptions = {
-  'action-folder': 'actions',
-  'config-path': 'ext.config.yaml',
+  'action-folder': 'src/dx-excshell-1/actions',
+  'config-path': 'src/dx-excshell-1/ext.config.yaml',
+  'events-config-path': 'app.config.yaml',
   'full-key-to-manifest': 'runtimeManifest',
-  'full-key-to-events-manifest': 'events'
+  'full-key-to-events-manifest': 'extensions.dx/excshell/1.events'
 }

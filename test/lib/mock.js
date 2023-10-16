@@ -73,7 +73,7 @@ const testRegistration = {
       provider_metadata: 'provider-metadata-2'
     }
   ],
-  runtime_action: 'fakeDestRoot/test-action-name'
+  runtime_action: 'dx-excshell-1/test-action-name'
 }
 
 const existingTestRegistration = {
@@ -87,7 +87,7 @@ const existingTestRegistration = {
       provider_metadata: 'provider-metadata-3'
     }
   ],
-  runtime_action: 'somepackage/test-action-name-existing'
+  runtime_action: 'dx-excshell-1/test-action-name-existing'
 }
 
 const eventsManifestDetails = {
