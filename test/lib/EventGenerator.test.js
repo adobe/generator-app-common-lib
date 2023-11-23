@@ -230,7 +230,7 @@ describe('implementation', () => {
                 'test-action-name-existing': {
                   function: 'actions/generic/index.js',
                   web: 'yes',
-                  runtime: 'nodejs:16',
+                  runtime: 'nodejs:18',
                   inputs: {
                     LOG_LEVEL: 'debug'
                   },
@@ -290,7 +290,7 @@ describe('implementation', () => {
                 'test-action-name-prev': {
                   function: 'actions/generic/index.js',
                   web: 'yes',
-                  runtime: 'nodejs:16',
+                  runtime: 'nodejs:18',
                   inputs: {
                     LOG_LEVEL: 'debug'
                   },
@@ -348,7 +348,7 @@ describe('implementation', () => {
                 'test-action-name-existing': {
                   function: 'actions/generic/index.js',
                   web: 'yes',
-                  runtime: 'nodejs:16',
+                  runtime: 'nodejs:18',
                   inputs: {
                     LOG_LEVEL: 'debug'
                   },
