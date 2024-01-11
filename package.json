@@ -31,10 +31,10 @@
     "stdout-stderr": "^0.1.13"
   },
   "dependencies": {
-    "@adobe/aio-lib-core-config": "^4.0.0",
-    "@adobe/aio-lib-env": "^2.0.0",
-    "@adobe/aio-lib-events": "^3.2.0",
-    "@adobe/aio-lib-ims": "^6.3.0",
+    "@adobe/aio-lib-core-config": "^5",
+    "@adobe/aio-lib-env": "^3",
+    "@adobe/aio-lib-events": "^4",
+    "@adobe/aio-lib-ims": "^7",
     "js-yaml": "^4.1.0",
     "lodash.camelcase": "^4.3.0",
     "lodash.clonedeep": "^4.5.0",
