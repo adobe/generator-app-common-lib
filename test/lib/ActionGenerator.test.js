@@ -181,6 +181,7 @@ Note: characters can only be split by '-'.
       utils.readPackageJson.mockReturnValue({})
       utils.readYAMLConfig.mockReturnValue({})
 
+      // third parameter options is {} by default here
       actionGenerator.addAction('myAction', './templateFile.js')
 
       // 1. test copy action template to right destination
@@ -192,9 +193,8 @@ Note: characters can only be split by '-'.
         'runtimeManifest',
         // function path should be checked to be relative to config file
         { packages: { 'dx-excshell-1': { actions: { myAction: { annotations: { 'require-adobe-auth': true }, function: expect.stringContaining('myAction/index.js'), runtime: constants.defaultRuntimeKind, web: 'yes' } }, license: 'Apache-2.0' } } })
-
-      // 3. make sure wskdebug dev dependency was added to package.json
-      expect(utils.addDependencies).toHaveBeenCalledWith(actionGenerator, { '@openwhisk/wskdebug': expect.any(String) }, true)
+      // dev or prod
+      expect(utils.addDependencies).not.toHaveBeenCalled()
     })
 
     test('with extra dependencies and manifest already exists', () => {
@@ -226,13 +226,13 @@ Note: characters can only be split by '-'.
       // 3. make sure wskdebug dev dependency was added to package.json
       // prod
       expect(utils.addDependencies).toHaveBeenCalledWith(actionGenerator, {
-        abc: '1.2.3', def: '4.5.6'
+        abc: '1.2.3',
+        def: '4.5.6'
       })
       // dev
       expect(utils.addDependencies).toHaveBeenCalledWith(actionGenerator, {
         xyz: '3.2.1',
-        vuw: '6.5.4',
-        '@openwhisk/wskdebug': expect.any(String)
+        vuw: '6.5.4'
       }, true)
     })
 
