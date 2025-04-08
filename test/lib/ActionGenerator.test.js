@@ -130,7 +130,7 @@ describe('implementation', () => {
     test('rejects invalid name with a message`', async () => {
       const invalidName = 'a'
       const invalidNameMessage = `'${invalidName}' is not a valid action name, please make sure that:
-The name has at least 3 characters or less than 33 characters.            
+The name has at least 3 characters or less than 33 characters.
 The first character is an alphanumeric character.
 The subsequent characters are alphanumeric.
 The last character isn't a space.
@@ -192,9 +192,6 @@ Note: characters can only be split by '-'.
         'runtimeManifest',
         // function path should be checked to be relative to config file
         { packages: { 'dx-excshell-1': { actions: { myAction: { annotations: { 'require-adobe-auth': true }, function: expect.stringContaining('myAction/index.js'), runtime: constants.defaultRuntimeKind, web: 'yes' } }, license: 'Apache-2.0' } } })
-
-      // 3. make sure wskdebug dev dependency was added to package.json
-      expect(utils.addDependencies).toHaveBeenCalledWith(actionGenerator, { '@openwhisk/wskdebug': expect.any(String) }, true)
     })
 
     test('with extra dependencies and manifest already exists', () => {
@@ -212,10 +209,16 @@ Note: characters can only be split by '-'.
         }
       })
 
-      actionGenerator.addAction('myAction', './templateFile.js', { dependencies: { abc: '1.2.3', def: '4.5.6' }, devDependencies: { xyz: '3.2.1', vuw: '6.5.4' } })
+      actionGenerator.addAction('myAction', './templateFile.js', {
+        dependencies: { abc: '1.2.3', def: '4.5.6' },
+        devDependencies: { xyz: '3.2.1', vuw: '6.5.4' }
+      })
 
       // 1. test copy action template to right destination
-      expect(actionGenerator.fs.copyTpl).toHaveBeenCalledWith(n('/fakeTplDir/templateFile.js'), n(`${actionFolderPath}/myAction/index.js`), {}, {}, {})
+      expect(actionGenerator.fs.copyTpl).toHaveBeenCalledWith(
+        n('/fakeTplDir/templateFile.js'),
+        n(`${actionFolderPath}/myAction/index.js`), {}, {}, {})
+
       // 2. test manifest creation with action information, and preserving previous content
       expect(utils.writeKeyYAMLConfig).toHaveBeenCalledWith(
         actionGenerator,
@@ -223,7 +226,8 @@ Note: characters can only be split by '-'.
         'runtimeManifest',
         // function path should be checked to be relative to config file
         { packages: { 'dx-excshell-1': { actions: { actionxyz: { function: 'fake.js' }, myAction: { annotations: { 'require-adobe-auth': true }, function: expect.stringContaining('myAction/index.js'), runtime: constants.defaultRuntimeKind, web: 'yes' } } } } })
-      // 3. make sure wskdebug dev dependency was added to package.json
+      // 3. make sure (dev)dependencies get added to package.json
+      expect(utils.addDependencies).toHaveBeenCalledTimes(2)
       // prod
       expect(utils.addDependencies).toHaveBeenCalledWith(actionGenerator, {
         abc: '1.2.3', def: '4.5.6'
@@ -231,8 +235,7 @@ Note: characters can only be split by '-'.
       // dev
       expect(utils.addDependencies).toHaveBeenCalledWith(actionGenerator, {
         xyz: '3.2.1',
-        vuw: '6.5.4',
-        '@openwhisk/wskdebug': expect.any(String)
+        vuw: '6.5.4'
       }, true)
     })
 
