@@ -3,14 +3,15 @@ Copyright 2022 Adobe. All rights reserved.
 This file is licensed to you under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License. You may obtain a copy
 of the License at http://www.apache.org/licenses/LICENSE-2.0
+
 Unless required by applicable law or agreed to in writing, software distributed under
 the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
 OF ANY KIND, either express or implied. See the License for the specific language
 governing permissions and limitations under the License.
 */
 
-const utils = require('../../lib/utils')
-const eol = require('eol')
+import * as utils from '../../lib/utils.js'
+import eol from 'eol'
 
 describe('atLeastOne', () => {
   test('returns true if input.length > 0', () => {
@@ -23,7 +24,7 @@ describe('atLeastOne', () => {
 
 describe('guessProjectName', () => {
   test('returns cwd if package.json does not exist', () => {
-    const spy = jest.spyOn(process, 'cwd')
+    const spy = vi.spyOn(process, 'cwd')
     spy.mockReturnValue('FAKECWD')
     expect(utils.guessProjectName({
       destinationPath: () => { },
@@ -35,7 +36,7 @@ describe('guessProjectName', () => {
   })
 
   test('returns cwd if package.json[name] is not defined', () => {
-    const spy = jest.spyOn(process, 'cwd')
+    const spy = vi.spyOn(process, 'cwd')
     spy.mockReturnValue('FAKECWD')
     expect(utils.guessProjectName({
       destinationPath: () => { },
@@ -60,10 +61,10 @@ describe('guessProjectName', () => {
 
 describe('addPkgScript', () => {
   test('adds scripts to package.json', () => {
-    const mockRead = jest.fn(() => {
+    const mockRead = vi.fn(() => {
       return ({ name: 'bob', scripts: { scripta: 'a' } })
     })
-    const mockWrite = jest.fn()
+    const mockWrite = vi.fn()
     const generator = {
       destinationPath: () => 'some-path',
       fs: {
@@ -79,10 +80,10 @@ describe('addPkgScript', () => {
   })
 
   test('overwrites existing scripts package.json', () => {
-    const mockRead = jest.fn(() => {
+    const mockRead = vi.fn(() => {
       return ({ name: 'bob', scripts: { scripta: 'a' } })
     })
-    const mockWrite = jest.fn()
+    const mockWrite = vi.fn()
     const generator = {
       destinationPath: () => 'some-path',
       fs: {
@@ -98,8 +99,8 @@ describe('addPkgScript', () => {
   })
 
   test('writes package.json if null', () => {
-    const mockRead = jest.fn()
-    const mockWrite = jest.fn()
+    const mockRead = vi.fn()
+    const mockWrite = vi.fn()
     const generator = {
       destinationPath: () => 'some-path',
       fs: {
@@ -117,11 +118,11 @@ describe('addPkgScript', () => {
 
 describe('readPackageJson', () => {
   test('if package.json is empty', () => {
-    const mockRead = jest.fn(() => {
+    const mockRead = vi.fn(() => {
       return ''
     })
     const generator = {
-      destinationPath: jest.fn(() => 'some-path'),
+      destinationPath: vi.fn(() => 'some-path'),
       fs: {
         readJSON: mockRead
       }
@@ -132,11 +133,11 @@ describe('readPackageJson', () => {
   })
 
   test('if package.json is { a: key, scripts: { b: c } }', () => {
-    const mockRead = jest.fn(() => {
+    const mockRead = vi.fn(() => {
       return { a: 'key', scripts: { b: 'c' } }
     })
     const generator = {
-      destinationPath: jest.fn(() => 'some-path'),
+      destinationPath: vi.fn(() => 'some-path'),
       fs: {
         readJSON: mockRead
       }
@@ -149,11 +150,11 @@ describe('readPackageJson', () => {
 
 describe('writePackageJson', () => {
   test('if content is empty', () => {
-    const mockWrite = jest.fn(() => {
+    const mockWrite = vi.fn(() => {
       return ''
     })
     const generator = {
-      destinationPath: jest.fn(() => 'some-path'),
+      destinationPath: vi.fn(() => 'some-path'),
       fs: {
         writeJSON: mockWrite
       }
@@ -164,11 +165,11 @@ describe('writePackageJson', () => {
   })
 
   test('if content is { a: key, scripts: { b: c } }', () => {
-    const mockWrite = jest.fn(() => {
+    const mockWrite = vi.fn(() => {
       return ''
     })
     const generator = {
-      destinationPath: jest.fn(() => 'some-path'),
+      destinationPath: vi.fn(() => 'some-path'),
       fs: {
         writeJSON: mockWrite
       }
@@ -181,12 +182,12 @@ describe('writePackageJson', () => {
 
 describe('addDependencies', () => {
   test('adds dependencies to package.json with no existing dependencies', () => {
-    const mockRead = jest.fn(() => {
+    const mockRead = vi.fn(() => {
       return undefined
     })
-    const mockWrite = jest.fn()
+    const mockWrite = vi.fn()
     const generator = {
-      destinationPath: jest.fn(() => 'some-path'),
+      destinationPath: vi.fn(() => 'some-path'),
       fs: {
         readJSON: mockRead,
         writeJSON: mockWrite
@@ -201,12 +202,12 @@ describe('addDependencies', () => {
     expect(mockWrite).toHaveBeenCalledWith('some-path', { dependencies: { a: 'b', c: 'd' } })
   })
   test('adds devDependencies to package.json with no existing devDependencies', () => {
-    const mockRead = jest.fn(() => {
+    const mockRead = vi.fn(() => {
       return undefined
     })
-    const mockWrite = jest.fn()
+    const mockWrite = vi.fn()
     const generator = {
-      destinationPath: jest.fn(() => 'some-path'),
+      destinationPath: vi.fn(() => 'some-path'),
       fs: {
         readJSON: mockRead,
         writeJSON: mockWrite
@@ -221,12 +222,12 @@ describe('addDependencies', () => {
     expect(mockWrite).toHaveBeenCalledWith('some-path', { devDependencies: { a: 'b', c: 'd' } })
   })
   test('adds and overwrites dependencies in package.json', () => {
-    const mockRead = jest.fn(() => {
+    const mockRead = vi.fn(() => {
       return { dependencies: { a: 'fake', e: 'f' }, devDependencies: { g: 'h' } }
     })
-    const mockWrite = jest.fn()
+    const mockWrite = vi.fn()
     const generator = {
-      destinationPath: jest.fn(() => 'some-path'),
+      destinationPath: vi.fn(() => 'some-path'),
       fs: {
         readJSON: mockRead,
         writeJSON: mockWrite
@@ -242,12 +243,12 @@ describe('addDependencies', () => {
   })
 
   test('adds and overwrites devDependencies in package.json', () => {
-    const mockRead = jest.fn(() => {
+    const mockRead = vi.fn(() => {
       return { devDependencies: { a: 'fake', e: 'f' }, dependencies: { g: 'h' } }
     })
-    const mockWrite = jest.fn()
+    const mockWrite = vi.fn()
     const generator = {
-      destinationPath: jest.fn(() => 'some-path'),
+      destinationPath: vi.fn(() => 'some-path'),
       fs: {
         readJSON: mockRead,
         writeJSON: mockWrite
@@ -263,15 +264,15 @@ describe('addDependencies', () => {
   })
 
   test('appendStubVarsToDotenv existing label', () => {
-    const mockRead = jest.fn(() => '# label')
-    const mockExists = jest.fn(() => {
+    const mockRead = vi.fn(() => '# label')
+    const mockExists = vi.fn(() => {
       return true
     })
     const generator = {
-      destinationPath: jest.fn(() => 'some-path'),
+      destinationPath: vi.fn(() => 'some-path'),
       fs: {
         read: mockRead,
-        append: jest.fn(),
+        append: vi.fn(),
         exists: mockExists
       }
     }
@@ -281,15 +282,15 @@ describe('addDependencies', () => {
   })
 
   test('appendStubVarsToDotenv', () => {
-    const mockRead = jest.fn(() => '')
-    const mockExists = jest.fn(() => {
+    const mockRead = vi.fn(() => '')
+    const mockExists = vi.fn(() => {
       return false
     })
     const generator = {
-      destinationPath: jest.fn(() => 'some-path'),
+      destinationPath: vi.fn(() => 'some-path'),
       fs: {
         read: mockRead,
-        append: jest.fn(),
+        append: vi.fn(),
         exists: mockExists
       }
     }
@@ -333,11 +334,11 @@ describe('addDependencies', () => {
 })
 test('writeKeyAppConfig', () => {
   const generator = {
-    destinationPath: jest.fn(() => 'some-path'),
+    destinationPath: vi.fn(() => 'some-path'),
     fs: {
-      exists: jest.fn().mockImplementationOnce(() => true),
-      write: jest.fn(),
-      read: jest.fn()
+      exists: vi.fn().mockReturnValue(true),
+      write: vi.fn(),
+      read: vi.fn().mockReturnValue('{}')
     }
   }
   utils.writeKeyAppConfig(generator, 'key', 'value')
@@ -345,28 +346,28 @@ test('writeKeyAppConfig', () => {
 })
 test('readYAMLConfig, configPath doesnt exists', () => {
   const generator = {
-    destinationPath: jest.fn(() => 'some-path'),
+    destinationPath: vi.fn(() => 'some-path'),
     fs: {
-      exists: jest.fn().mockImplementationOnce(() => false),
-      write: jest.fn(),
-      read: jest.fn()
+      exists: vi.fn().mockImplementationOnce(() => false),
+      write: vi.fn(),
+      read: vi.fn()
     }
   }
   expect(utils.readYAMLConfig(generator, 'some-path')).toStrictEqual({})
 })
 
 test('appendVarsToDotenv without previous content', () => {
-  const mockRead = jest.fn(() => '')
-  const mockExists = jest.fn(() => {
+  const mockRead = vi.fn(() => '')
+  const mockExists = vi.fn(() => {
     return false
   })
   const generator = {
-    destinationPath: jest.fn(() => 'some-path'),
+    destinationPath: vi.fn(() => 'some-path'),
     fs: {
       read: mockRead,
-      append: jest.fn(),
+      append: vi.fn(),
       exists: mockExists,
-      write: jest.fn()
+      write: vi.fn()
     }
   }
 
@@ -377,17 +378,17 @@ variable-a=value-a
 })
 
 test('appendVarsToDotenv with previous content', () => {
-  const mockRead = jest.fn(() => 'variable-a=value-a')
-  const mockExists = jest.fn(() => {
+  const mockRead = vi.fn(() => 'variable-a=value-a')
+  const mockExists = vi.fn(() => {
     return true
   })
   const generator = {
-    destinationPath: jest.fn(() => 'some-path'),
+    destinationPath: vi.fn(() => 'some-path'),
     fs: {
       read: mockRead,
-      append: jest.fn(),
+      append: vi.fn(),
       exists: mockExists,
-      write: jest.fn()
+      write: vi.fn()
     }
   }
 

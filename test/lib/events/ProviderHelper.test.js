@@ -3,31 +3,37 @@ Copyright 2023 Adobe. All rights reserved.
 This file is licensed to you under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License. You may obtain a copy
 of the License at http://www.apache.org/licenses/LICENSE-2.0
+
 Unless required by applicable law or agreed to in writing, software distributed under
 the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
 OF ANY KIND, either express or implied. See the License for the specific language
 governing permissions and limitations under the License.
 */
 
-const mockData = require('../mock')
-const {
+import { data } from '../mock.js'
+import {
   selectEventMetadataForProvider, selectProviderForProviderMetadata,
   getAllEntitledProvidersForOrg
-} = require('../../../lib/events/ProviderHelper')
-const EventsGenerator = require('../../../lib/EventsGenerator')
-const eventsSdk = require('@adobe/aio-lib-events')
+} from '../../../lib/events/ProviderHelper.js'
 
-jest.mock('yeoman-generator')
-jest.mock('@adobe/aio-lib-events')
-jest.mock('../../../lib/EventsGenerator')
+vi.mock('yeoman-generator')
+vi.mock('@adobe/aio-lib-events')
+vi.mock('../../../lib/EventsGenerator.js', () => {
+  const EventsGenerator = vi.fn()
+  EventsGenerator.prototype.prompt = vi.fn()
+  return { default: EventsGenerator }
+})
 
-jest.mock('../../../lib/events/ProviderMetadataHelper', () => ({
-  getEntitledProviderMetadataForOrg: jest.fn().mockResolvedValue(mockData.data.providerMetadataList),
-  getProviderMetadata: jest.fn().mockResolvedValue(['provider-metadata-1', 'provider-metadata-2'])
+vi.mock('../../../lib/events/ProviderMetadataHelper.js', () => ({
+  getEntitledProviderMetadataForOrg: vi.fn(),
+  getProviderMetadata: vi.fn().mockResolvedValue(['provider-metadata-1', 'provider-metadata-2'])
 }))
 
+import eventsSdk from '@adobe/aio-lib-events'
+import EventsGenerator from '../../../lib/EventsGenerator.js'
+
 const mockEventsSdkInstance = {
-  getAllProviders: jest.fn().mockResolvedValue({
+  getAllProviders: vi.fn().mockResolvedValue({
     _embedded: {
       providers: [{
         id: 'provider-id-1',
@@ -79,9 +85,9 @@ describe('test provider selection helper', () => {
   let promptSpy
   let eventsClient
   beforeEach(async () => {
-    promptSpy = jest.spyOn(EventsGenerator.prototype, 'prompt')
+    promptSpy = vi.spyOn(EventsGenerator.prototype, 'prompt')
     eventsClient = await eventsSdk.init('orgid', 'api-key', 'token')
-    EventsGenerator.prototype.projectConfig = mockData.data.projectConfig
+    EventsGenerator.prototype.projectConfig = data.projectConfig
     eventsGenerator = new EventsGenerator()
   })
   afterEach(() => {

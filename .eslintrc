@@ -1,11 +1,26 @@
 {
-    "plugins": ["jest"],
-    "extends": ["standard", "plugin:jest/recommended"],
+    "extends": ["standard"],
     "globals": {
       "n": "readonly",
       "r": "readonly",
       "assertDependencies": "readonly",
-      "assertNodeEngines": "readonly"
-    }
+      "assertNodeEngines": "readonly",
+      "vi": "readonly",
+      "describe": "readonly",
+      "test": "readonly",
+      "it": "readonly",
+      "expect": "readonly",
+      "beforeEach": "readonly",
+      "afterEach": "readonly",
+      "beforeAll": "readonly",
+      "afterAll": "readonly"
+    },
+    "overrides": [
+      {
+        "files": ["test/**/*.js"],
+        "rules": {
+          "import/first": "off"
+        }
+      }
+    ]
   }
-  

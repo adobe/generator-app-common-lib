@@ -3,31 +3,39 @@ Copyright 2023 Adobe. All rights reserved.
 This file is licensed to you under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License. You may obtain a copy
 of the License at http://www.apache.org/licenses/LICENSE-2.0
+
 Unless required by applicable law or agreed to in writing, software distributed under
 the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
 OF ANY KIND, either express or implied. See the License for the specific language
 governing permissions and limitations under the License.
 */
 
-const eventsSdk = require('@adobe/aio-lib-events')
-const mockData = require('../mock')
-const { promptForEventsOfInterest, getProviderMetadataToProvidersExistingMap } = require('../../../lib/events/EventsOfInterestHelper')
-const { getAllEntitledProvidersForOrg, selectEventMetadataForProvider, selectProviderForProviderMetadata } = require('../../../lib/events/ProviderHelper')
-const EventsGenerator = require('../../../lib/EventsGenerator')
-const { getProviderMetadata } = require('../../../lib/events/ProviderMetadataHelper')
-jest.mock('yeoman-generator')
-jest.mock('../../../lib/EventsGenerator')
-jest.mock('@adobe/aio-lib-events')
-jest.mock('../../../lib/events/ProviderHelper', () => ({
-  selectEventMetadataForProvider: jest.fn(),
-  selectProviderForProviderMetadata: jest.fn(),
-  getAllEntitledProvidersForOrg: jest.fn()
+import { data } from '../mock.js'
+import { promptForEventsOfInterest, getProviderMetadataToProvidersExistingMap } from '../../../lib/events/EventsOfInterestHelper.js'
+
+vi.mock('yeoman-generator')
+vi.mock('../../../lib/EventsGenerator.js', () => {
+  const EventsGenerator = vi.fn()
+  EventsGenerator.prototype.prompt = vi.fn()
+  return { default: EventsGenerator }
+})
+vi.mock('@adobe/aio-lib-events')
+
+vi.mock('../../../lib/events/ProviderHelper.js', () => ({
+  selectEventMetadataForProvider: vi.fn(),
+  selectProviderForProviderMetadata: vi.fn(),
+  getAllEntitledProvidersForOrg: vi.fn()
 }))
 
-jest.mock('../../../lib/events/ProviderMetadataHelper', () => ({
-  getEntitledProviderMetadataForOrg: jest.fn().mockResolvedValue(mockData.data.providerMetadataList),
-  getProviderMetadata: jest.fn().mockResolvedValue(['provider-metadata-1', 'provider-metadata-2'])
+vi.mock('../../../lib/events/ProviderMetadataHelper.js', () => ({
+  getEntitledProviderMetadataForOrg: vi.fn(),
+  getProviderMetadata: vi.fn().mockResolvedValue(['provider-metadata-1', 'provider-metadata-2'])
 }))
+
+import eventsSdk from '@adobe/aio-lib-events'
+import EventsGenerator from '../../../lib/EventsGenerator.js'
+import { getAllEntitledProvidersForOrg, selectEventMetadataForProvider, selectProviderForProviderMetadata } from '../../../lib/events/ProviderHelper.js'
+import { getEntitledProviderMetadataForOrg, getProviderMetadata } from '../../../lib/events/ProviderMetadataHelper.js'
 
 const getTestProvider = (index, numberOfEvents) => {
   const eventMetadatas = []
@@ -71,7 +79,7 @@ describe('test prompt for events of interest', () => {
   let eventsGenerator
   let eventsClient
   beforeEach(async () => {
-    EventsGenerator.prototype.projectConfig = mockData.data.projectConfig
+    EventsGenerator.prototype.projectConfig = data.projectConfig
     eventsClient = await eventsSdk.init('orgid', 'api-key', 'token')
     eventsGenerator = new EventsGenerator()
     selectEventMetadataForProvider
@@ -85,6 +93,7 @@ describe('test prompt for events of interest', () => {
       getTestProvider(2, 1),
       getTestProvider(3, 0)
     ])
+    vi.mocked(getEntitledProviderMetadataForOrg).mockResolvedValue(data.providerMetadataList)
   })
 
   test('successfully fetch providers to event metadata map', async () => {
