@@ -9,18 +9,17 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const path = require('path')
-const cloneDeep = require('lodash.clonedeep')
+import path from 'node:path'
+import cloneDeep from 'lodash.clonedeep'
 
-const constants = require('../../lib/constants')
+import * as constants from '../../lib/constants.js'
 
-jest.mock('yeoman-generator')
+import ActionGenerator from '../../lib/ActionGenerator.js'
+import Generator from 'yeoman-generator'
+import * as utils from '../../lib/utils.js'
 
-const ActionGenerator = require('../../lib/ActionGenerator')
-const Generator = require('yeoman-generator')
-
-jest.mock('../../lib/utils.js')
-const utils = require('../../lib/utils.js')
+vi.mock('yeoman-generator')
+vi.mock('../../lib/utils.js')
 
 const generatorOptions = cloneDeep(global.basicGeneratorOptions)
 
@@ -52,7 +51,7 @@ describe('implementation', () => {
   })
   describe('constructor', () => {
     test('accept options', () => {
-      const spy = jest.spyOn(ActionGenerator.prototype, 'option')
+      const spy = vi.spyOn(ActionGenerator.prototype, 'option')
       // eslint-disable-next-line no-new
       new ActionGenerator()
       expect(spy).toHaveBeenCalledWith('skip-prompt', { default: false })
@@ -72,7 +71,7 @@ describe('implementation', () => {
     let promptSpy
     let actionGenerator
     beforeEach(() => {
-      promptSpy = jest.spyOn(ActionGenerator.prototype, 'prompt')
+      promptSpy = vi.spyOn(ActionGenerator.prototype, 'prompt')
       actionGenerator = new ActionGenerator()
       actionGenerator.options = { 'skip-prompt': false }
     })
@@ -169,7 +168,7 @@ Note: characters can only be split by '-'.
     beforeEach(() => {
       actionGenerator = new ActionGenerator()
       actionGenerator.options = { 'skip-prompt': false }
-      actionGenerator.fs = { copyTpl: jest.fn() }
+      actionGenerator.fs = { copyTpl: vi.fn() }
 
       // mock path resolvers
       actionGenerator.templatePath = p => path.join('/fakeTplDir', p)

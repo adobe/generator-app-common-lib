@@ -9,16 +9,16 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const eventsSdk = require('@adobe/aio-lib-events')
-const mockData = require('../mock')
-const { getEntitledProviderMetadataForOrg, getProviderMetadata } = require('../../../lib/events/ProviderMetadataHelper')
-const EventsGenerator = require('../../../lib/EventsGenerator')
-jest.mock('@adobe/aio-lib-events')
-jest.mock('yeoman-generator')
-jest.mock('../../../lib/EventsGenerator')
+import eventsSdk from '@adobe/aio-lib-events'
+import mockData from '../mock.js'
+import { getEntitledProviderMetadataForOrg, getProviderMetadata } from '../../../lib/events/ProviderMetadataHelper.js'
+import EventsGenerator from '../../../lib/EventsGenerator.js'
+vi.mock('@adobe/aio-lib-events', () => ({ default: { init: vi.fn() } }))
+vi.mock('yeoman-generator')
+vi.mock('../../../lib/EventsGenerator.js')
 
 const mockEventsSdkInstance = {
-  getProviderMetadata: jest.fn().mockResolvedValue(mockData.data.embeddedProviderMetadata)
+  getProviderMetadata: vi.fn().mockResolvedValue(mockData.data.embeddedProviderMetadata)
 }
 
 beforeEach(() => {
@@ -30,7 +30,7 @@ describe('test provider metadata selection helper', () => {
   let promptSpy
   let eventsClient
   beforeEach(async () => {
-    promptSpy = jest.spyOn(EventsGenerator.prototype, 'prompt')
+    promptSpy = vi.spyOn(EventsGenerator.prototype, 'prompt')
     eventsClient = await eventsSdk.init('orgid', 'api-key', 'token')
     eventsGenerator = new EventsGenerator()
   })
