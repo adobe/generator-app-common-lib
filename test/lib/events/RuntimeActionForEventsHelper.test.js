@@ -9,22 +9,22 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const mockData = require('../mock')
-const { promptForRuntimeAction } = require('../../../lib/events/RuntimeActionForEventsHelper')
-const EventsGenerator = require('../../../lib/EventsGenerator')
-jest.mock('yeoman-generator')
-jest.mock('../../../lib/EventsGenerator')
+import mockData from '../mock.js'
+import { promptForRuntimeAction } from '../../../lib/events/RuntimeActionForEventsHelper.js'
+import EventsGenerator from '../../../lib/EventsGenerator.js'
+vi.mock('yeoman-generator')
+vi.mock('../../../lib/EventsGenerator.js')
 
 describe('test runtime action selection helper', () => {
   let eventsGenerator
   let promptSpy
   beforeEach(() => {
-    promptSpy = jest.spyOn(EventsGenerator.prototype, 'prompt')
-    EventsGenerator.prototype.loadRuntimeManifest = jest.fn().mockReturnValue({
+    promptSpy = vi.spyOn(EventsGenerator.prototype, 'prompt')
+    EventsGenerator.prototype.loadRuntimeManifest = vi.fn().mockReturnValue({
       runtimeManifest: mockData.data.runtimeManifestWithAvailableNonWebActions,
       runtimePackageName: 'somepackage'
     })
-    EventsGenerator.prototype.promptForActionName = jest.fn().mockReturnValue('test-runtime-action-name')
+    EventsGenerator.prototype.promptForActionName = vi.fn().mockReturnValue('test-runtime-action-name')
     eventsGenerator = new EventsGenerator()
     eventsGenerator.options = { 'skip-prompt': false }
   })
@@ -75,14 +75,14 @@ describe('test runtime action selection helper', () => {
   })
 
   test('skip selection of existing action when no non-web actions available', async () => {
-    EventsGenerator.prototype.loadRuntimeManifest = jest.fn().mockReturnValue({
+    EventsGenerator.prototype.loadRuntimeManifest = vi.fn().mockReturnValue({
       runtimeManifest: mockData.data.runtimeManifestWithWebActions,
       runtimePackageName: 'somepackage'
     })
     promptSpy.mockResolvedValue({
       actionSelection: true
     })
-    EventsGenerator.prototype.promptForActionName = jest.fn().mockReturnValue('test-runtime-action-name')
+    EventsGenerator.prototype.promptForActionName = vi.fn().mockReturnValue('test-runtime-action-name')
     eventsGenerator = new EventsGenerator()
 
     const runtimeActionName = await promptForRuntimeAction(eventsGenerator)
