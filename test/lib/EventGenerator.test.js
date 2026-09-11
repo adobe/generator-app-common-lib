@@ -9,40 +9,35 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const path = require('path')
-const mockData = require('./mock')
-const cloneDeep = require('lodash.clonedeep')
-const eventsSdk = require('@adobe/aio-lib-events')
-const { getProviderMetadataToProvidersExistingMap } = require('../../lib/events/EventsOfInterestHelper')
+import path from 'node:path'
+import mockData from './mock.js'
+import cloneDeep from 'lodash.clonedeep'
+import eventsSdk from '@adobe/aio-lib-events'
+import { getProviderMetadataToProvidersExistingMap } from '../../lib/events/EventsOfInterestHelper.js'
+import EventsGenerator from '../../lib/EventsGenerator.js'
+import Generator from 'yeoman-generator'
+import * as utils from '../../lib/utils.js'
 
 const mockEventsSdkInstance = {
-  createRegistration: jest.fn(),
-  updateRegistration: jest.fn()
+  createRegistration: vi.fn(),
+  updateRegistration: vi.fn()
 }
-jest.mock('@adobe/aio-lib-ims', () => ({
-  getToken: jest.fn().mockResolvedValue('token')
-}))
-
-jest.mock('@adobe/aio-lib-ims', () => ({
-  getToken: jest.fn().mockResolvedValue('token')
-}))
-
-jest.mock('../../lib/events/EventsOfInterestHelper', () => ({
-  promptForEventsOfInterest: jest.fn().mockResolvedValue(mockData.data.selectedProvidersToEventMetadata),
-  getProviderMetadataToProvidersExistingMap: jest.fn()
-}))
-
-jest.mock('../../lib/events/RuntimeActionForEventsHelper', () => ({
-  promptForRuntimeAction: jest.fn().mockResolvedValue('test-action-name')
-}))
-
-const EventsGenerator = require('../../lib/EventsGenerator')
-const Generator = require('yeoman-generator')
 const generatorOptions = cloneDeep(global.basicGeneratorOptions)
-jest.mock('yeoman-generator')
-jest.mock('@adobe/aio-lib-events')
-jest.mock('../../lib/utils.js')
-const utils = require('../../lib/utils.js')
+
+vi.mock('@adobe/aio-lib-ims', () => ({ default: { getToken: vi.fn().mockResolvedValue('token') } }))
+vi.mock('../../lib/events/EventsOfInterestHelper.js', async () => {
+  const { default: mockData } = await import('./mock.js')
+  return {
+    promptForEventsOfInterest: vi.fn().mockResolvedValue(mockData.data.selectedProvidersToEventMetadata),
+    getProviderMetadataToProvidersExistingMap: vi.fn()
+  }
+})
+vi.mock('../../lib/events/RuntimeActionForEventsHelper.js', () => ({
+  promptForRuntimeAction: vi.fn().mockResolvedValue('test-action-name')
+}))
+vi.mock('yeoman-generator')
+vi.mock('@adobe/aio-lib-events', () => ({ default: { init: vi.fn() } }))
+vi.mock('../../lib/utils.js')
 
 const aioEventsMappingEnvVariable = 'AIO_EVENTS_PROVIDERMETADATA_TO_PROVIDER_MAPPING'
 
@@ -73,11 +68,11 @@ describe('implementation', () => {
       error: (text) => { throw text }
     }
     Generator.prototype.options = generatorOptions
-    EventsGenerator.prototype.addAction = jest.fn()
+    EventsGenerator.prototype.addAction = vi.fn()
   })
   describe('constructor', () => {
     test('accept options', () => {
-      const spy = jest.spyOn(EventsGenerator.prototype, 'option')
+      const spy = vi.spyOn(EventsGenerator.prototype, 'option')
       // eslint-disable-next-line no-new
       new EventsGenerator()
       expect(spy).toHaveBeenCalledWith('skip-prompt', { default: false })
@@ -101,7 +96,7 @@ describe('implementation', () => {
     let promptSpy
     let eventsGenerator
     beforeEach(() => {
-      promptSpy = jest.spyOn(EventsGenerator.prototype, 'prompt')
+      promptSpy = vi.spyOn(EventsGenerator.prototype, 'prompt')
       eventsGenerator = new EventsGenerator()
       eventsGenerator.options = { 'skip-prompt': false }
       EventsGenerator.prototype.env = {
@@ -125,7 +120,7 @@ describe('implementation', () => {
     let promptSpy
     let eventsGenerator
     beforeEach(async () => {
-      promptSpy = jest.spyOn(EventsGenerator.prototype, 'prompt')
+      promptSpy = vi.spyOn(EventsGenerator.prototype, 'prompt')
       eventsGenerator = new EventsGenerator()
       eventsGenerator.options = { 'skip-prompt': false }
       EventsGenerator.prototype.env = {
@@ -167,8 +162,8 @@ describe('implementation', () => {
     beforeEach(() => {
       eventsGenerator = new EventsGenerator()
       eventsGenerator.options = { 'skip-prompt': false }
-      eventsGenerator.addAction = jest.fn()
-      eventsGenerator.loadRuntimeManifest = jest.fn()
+      eventsGenerator.addAction = vi.fn()
+      eventsGenerator.loadRuntimeManifest = vi.fn()
     })
 
     test('with no options and manifest does not exist and no regDetails', () => {
