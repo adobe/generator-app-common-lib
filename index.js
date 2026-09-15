@@ -9,13 +9,13 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const utils = require('./lib/utils')
-const ActionGenerator = require('./lib/ActionGenerator')
-const EventsGenerator = require('./lib/EventsGenerator')
-const constants = require('./lib/constants')
-const commonTemplates = require('./lib/common-templates')
+import * as utils from './lib/utils.js'
+import ActionGenerator from './lib/ActionGenerator.js'
+import EventsGenerator from './lib/EventsGenerator.js'
+import * as constants from './lib/constants.js'
+import commonTemplates from './lib/common-templates/index.js'
 
-module.exports = {
+export {
   utils,
   constants,
   ActionGenerator,

@@ -9,25 +9,28 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const mockData = require('../mock')
-const {
+import mockData from '../mock.js'
+import {
   selectEventMetadataForProvider, selectProviderForProviderMetadata,
   getAllEntitledProvidersForOrg
-} = require('../../../lib/events/ProviderHelper')
-const EventsGenerator = require('../../../lib/EventsGenerator')
-const eventsSdk = require('@adobe/aio-lib-events')
+} from '../../../lib/events/ProviderHelper.js'
+import EventsGenerator from '../../../lib/EventsGenerator.js'
+import eventsSdk from '@adobe/aio-lib-events'
 
-jest.mock('yeoman-generator')
-jest.mock('@adobe/aio-lib-events')
-jest.mock('../../../lib/EventsGenerator')
+vi.mock('yeoman-generator')
+vi.mock('@adobe/aio-lib-events', () => ({ default: { init: vi.fn() } }))
+vi.mock('../../../lib/EventsGenerator.js')
 
-jest.mock('../../../lib/events/ProviderMetadataHelper', () => ({
-  getEntitledProviderMetadataForOrg: jest.fn().mockResolvedValue(mockData.data.providerMetadataList),
-  getProviderMetadata: jest.fn().mockResolvedValue(['provider-metadata-1', 'provider-metadata-2'])
-}))
+vi.mock('../../../lib/events/ProviderMetadataHelper.js', async () => {
+  const { default: mockData } = await import('../mock.js')
+  return {
+    getEntitledProviderMetadataForOrg: vi.fn().mockResolvedValue(mockData.data.providerMetadataList),
+    getProviderMetadata: vi.fn().mockResolvedValue(['provider-metadata-1', 'provider-metadata-2'])
+  }
+})
 
 const mockEventsSdkInstance = {
-  getAllProviders: jest.fn().mockResolvedValue({
+  getAllProviders: vi.fn().mockResolvedValue({
     _embedded: {
       providers: [{
         id: 'provider-id-1',
@@ -79,7 +82,7 @@ describe('test provider selection helper', () => {
   let promptSpy
   let eventsClient
   beforeEach(async () => {
-    promptSpy = jest.spyOn(EventsGenerator.prototype, 'prompt')
+    promptSpy = vi.spyOn(EventsGenerator.prototype, 'prompt')
     eventsClient = await eventsSdk.init('orgid', 'api-key', 'token')
     EventsGenerator.prototype.projectConfig = mockData.data.projectConfig
     eventsGenerator = new EventsGenerator()

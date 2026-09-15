@@ -1,11 +1,23 @@
 {
-    "plugins": ["jest"],
-    "extends": ["standard", "plugin:jest/recommended"],
-    "globals": {
-      "n": "readonly",
-      "r": "readonly",
-      "assertDependencies": "readonly",
-      "assertNodeEngines": "readonly"
-    }
+  "extends": ["standard"],
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module"
+  },
+  "globals": {
+    "n": "readonly",
+    "r": "readonly",
+    "assertDependencies": "readonly",
+    "assertNodeEngines": "readonly",
+    "basicGeneratorOptions": "readonly",
+    "vi": "readonly",
+    "describe": "readonly",
+    "it": "readonly",
+    "test": "readonly",
+    "expect": "readonly",
+    "beforeEach": "readonly",
+    "afterEach": "readonly",
+    "beforeAll": "readonly",
+    "afterAll": "readonly"
   }
-  
+}
