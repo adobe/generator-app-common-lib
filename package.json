@@ -1,6 +1,6 @@
 {
   "name": "@adobe/generator-app-common-lib",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "",
   "type": "module",
   "main": "index.js",
@@ -43,6 +43,6 @@
     "lodash.clonedeep": "^4.5.0",
     "process": "^0.11.10",
     "upath": "^2.0.1",
-    "yeoman-generator": "^8"
+    "yeoman-generator": "^7"
   }
 }
